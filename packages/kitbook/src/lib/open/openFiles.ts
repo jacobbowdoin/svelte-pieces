@@ -3,7 +3,7 @@ import { getFilenameAndExtension } from './get-filename-and-extension'
 import { serializeIntersection } from './serialize'
 
 export function openComponent(filepath: string) {
-  ensureFileExists(filepath)
+  rpc_client.functions.open_or_create_file({ filepath, template: '' })
 }
 
 export function openVariants(filepath: string, componentDetail?: SvelteComponentDetail) {
@@ -22,7 +22,7 @@ export function sendOpenVariantsRequest(filepath: string, serializedState: Recor
 
 export function openMarkdown(filepath: string) {
   const markdownTemplate = 'You can write some documentation for your component here using markdown.'
-  ensureFileExists(filepath, markdownTemplate)
+  ensure_non_svelte_file_exists(filepath, markdownTemplate)
 }
 
 export function openComposition({ filepath, compositionName }: { filepath: string, compositionName?: string }) {
@@ -63,10 +63,10 @@ Place your Svelte composition here.
 
   const compositionExtension = (compositionName && compositionName !== 'default') ? `${compositionName}.composition` : 'composition'
   const template = extension === 'md' ? markdownCompositionTemplate : svelteCompositionTemplate
-  ensureFileExists(`${filepathWithoutExtension}.${compositionExtension}`, template)
+  ensure_non_svelte_file_exists(`${filepathWithoutExtension}.${compositionExtension}`, template)
 }
 
-function ensureFileExists(filepath: string, template = '') {
+function ensure_non_svelte_file_exists(filepath: string, template: string) {
   const pageProofPath = filepath
     .replace('+page', '_page')
     .replace('+layout', '_layout')

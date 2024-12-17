@@ -8,12 +8,11 @@
 //
 // LZ-based compression algorithm, version 1.4.4
 
-// If other compressions are needed, uncomment and add tests from https://github.com/pieroxy/lz-string/blob/master/tests/lz-string-spec.js
+// If other compressions are needed pull from https://github.com/pieroxy/lz-string (bring tests across also)
 
 // Note also the esm port of lz-string for utf-8 only by @immutabl3/lz-string
 
 const f = String.fromCharCode
-// const keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 const keyStrUriSafe = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$'
 const baseReverseDic = {}
 
@@ -44,70 +43,6 @@ function getBaseValue(alphabet: string, character: string) {
   }
   return baseReverseDic[alphabet][character]
 }
-
-// export function compressToBase64(input) {
-//   if (input == null) return "";
-//   var res = _compress(input, 6, function (a) { return keyStrBase64.charAt(a); });
-//   switch (res.length % 4) { // To produce valid Base64
-//     default: // When could this happen ?
-//     case 0: return res;
-//     case 1: return res + "===";
-//     case 2: return res + "==";
-//     case 3: return res + "=";
-//   }
-// }
-
-// export function decompressFromBase64(input) {
-//   if (input == null) return "";
-//   if (input == "") return null;
-//   return _decompress(input.length, 32, function (index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
-// }
-
-// export function compressToUTF16(input) {
-//   if (input == null) return "";
-//   return _compress(input, 15, function (a) { return f(a + 32); }) + " ";
-// }
-
-// export function decompressFromUTF16(compressed) {
-//   if (compressed == null) return "";
-//   if (compressed == "") return null;
-//   return _decompress(compressed.length, 16384, function (index) { return compressed.charCodeAt(index) - 32; });
-// }
-
-// compress into uint8array (UCS-2 big endian format)
-// export function compressToUint8Array(uncompressed) {
-//   var compressed = compress(uncompressed);
-//   var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
-
-//   for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
-//     var current_value = compressed.charCodeAt(i);
-//     buf[i * 2] = current_value >>> 8;
-//     buf[i * 2 + 1] = current_value % 256;
-//   }
-//   return buf;
-// }
-
-// decompress from uint8array (UCS-2 big endian format)
-// export function decompressFromUint8Array(compressed) {
-//   if (compressed === null || compressed === undefined) {
-//     return decompress(compressed);
-//   } else {
-//     var buf = new Array(compressed.length / 2); // 2 bytes per character
-//     for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
-//       buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
-//     }
-
-//     var result = [];
-//     buf.forEach(function (c) {
-//       result.push(f(c));
-//     });
-//     return decompress(result.join(''));
-//   }
-// }
-
-// function compress(uncompressed) {
-//   return _compress(uncompressed, 16, function (a) { return f(a); });
-// }
 
 function _compress(uncompressed: string, bitsPerChar: number, getCharFromInt: (index: number) => any) {
   if (uncompressed == null)
@@ -340,12 +275,6 @@ function _compress(uncompressed: string, bitsPerChar: number, getCharFromInt: (i
   }
   return context_data.join('')
 }
-
-// function decompress(compressed) {
-//   if (compressed == null) return "";
-//   if (compressed == "") return null;
-//   return _decompress(compressed.length, 32768, function (index) { return compressed.charCodeAt(index); });
-// }
 
 function _decompress(length: number, resetValue: number, getNextValue: (index: number) => any) {
   const dictionary = []

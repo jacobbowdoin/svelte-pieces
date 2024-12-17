@@ -1,4 +1,5 @@
 import type { Plugin } from 'vite'
+import qr from 'qrcode-terminal'
 import type { KitbookSettings } from '../../kitbook-types'
 import { serializeSettings } from '../../open/serialize.js'
 import { bold, green, reset } from '../utils/colors.js'
@@ -41,13 +42,28 @@ export function MainPlugin(settings: KitbookSettings): Plugin {
 
     configureServer(server) {
       const { kitbookRoute, addLanguageToUrl, languages } = settings
-      if (kitbookRoute) {
-        const languageAwareRoute = addLanguageToUrl ? addLanguageToUrl({ code: languages[0].code, url: kitbookRoute }) : kitbookRoute
-        const originalPrint = server.printUrls
-        server.printUrls = () => {
-          originalPrint()
-          console.info(`  ${green}➜${reset}  ${bold}Kitbook${reset}: ${green}${server.config.server.https ? 'https' : 'http'}://localhost:${bold}${server.config.server.port}${reset}${green}${languageAwareRoute}${reset}`)
+
+      const originalPrint = server.printUrls
+      server.printUrls = () => {
+        originalPrint()
+
+        const additional_logs: string [] = []
+
+        if (kitbookRoute) {
+          const languageAwareRoute = addLanguageToUrl ? addLanguageToUrl({ code: languages[0].code, url: kitbookRoute }) : kitbookRoute
+          additional_logs.push(`  ${green}➜${reset}  ${bold}Kitbook${reset}: ${green}${server.config.server.https ? 'https' : 'http'}://localhost:${bold}${server.config.server.port}${reset}${green}${languageAwareRoute}${reset}`)
         }
+
+        const network_urls = server.resolvedUrls?.network || []
+        if (network_urls.length) {
+          const last_url = network_urls[network_urls.length - 1]
+          qr.generate(last_url, { small: true }, (result) => {
+            additional_logs.push(`\n    ${green}${last_url}${reset}\n    ${result.replace(/\n/g, '\n    ')}`)
+          })
+        }
+
+        for (const message of additional_logs)
+          console.info(message)
       }
     },
   }

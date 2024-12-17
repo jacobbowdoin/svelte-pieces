@@ -134,6 +134,8 @@
               {#if !variantsModule}
                 <Button onclick={() => openVariants(`${pathWithoutExtension}.svelte`)} size="sm" form="menu"><span class="i-system-uicons-versions align--4px text-xl" /> Add Variant</Button>
               {/if}
+
+              <Button size="sm" form="menu" href="/en/zh-TW/bible">Go to sample page</Button>
             {/if}
           </div>
 
